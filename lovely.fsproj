@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Defs.fs" />
+        <Compile Include="scenes\IntroScn.fs" />
+        <Compile Include="scenes\GameScn.fs" />
+        <Compile Include="scenes\MainMenuScn.fs" />
+        <Compile Include="Game.fs" />
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Love2DCS" Version="11.0.49" />
+    </ItemGroup>
+
+</Project>

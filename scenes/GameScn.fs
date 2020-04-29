@@ -2,38 +2,44 @@ namespace MyGame
 
 module GameScene =
     open Love
-
-    type Resources = { 
-        scene   : AvailableScenes
-        speed   : float32
-        img     : Image
-    }
-    type Model = { 
-        pos     : Vector2
-    }
-    
-    // constants and static resources are kept here
-    let resources = { 
-        scene   = GameScn
-        speed   = 300.0f
-        img     = Graphics.NewImage "assets/red_ball.png"
-    }
-    
-    // mutable model data is kept here
-    let mutable model: Model = {
-        pos = Vector2(300.0f, 300.0f)
-    }
-    
-    let update (data: Model, res: Resources, dt) =
-        let x = data.pos.X
-        let x = if Keyboard.IsDown(KeyConstant.Right) then x + (resources.speed * dt) else x
-        let x = if Keyboard.IsDown(KeyConstant.Left) then x - (resources.speed * dt) else x
+    // update the model with the keys pressed by end user
+    let handleKeyInput(data: Model, key, scode, isRepeat) = 
+        // let x = data.ballPos.X
+        // let x = if Keyboard.IsDown(KeyConstant.Right) then x + (Data.res.speed * dt) else x
+        // let x = if Keyboard.IsDown(KeyConstant.Left) then x - (Data.res.speed * dt) else x
         
-        let y = data.pos.Y
-        let y = if Keyboard.IsDown(KeyConstant.Down) then y + (resources.speed * dt) else y
-        let y = if Keyboard.IsDown(KeyConstant.Up) then y - (resources.speed * dt) else y
-        { data with pos = Vector2(x,y)}
+        // let y = data.ballPos.Y
+        // let y = if Keyboard.IsDown(KeyConstant.Down) then y + (Data.res.speed * dt) else y
+        // let y = if Keyboard.IsDown(KeyConstant.Up) then y - (Data.res.speed * dt) else y
+        // { data with ballPos = Vector2(x,y)}
+        data
 
-    let draw (data: Model) =
-        Graphics.Print("Game Scene", 10.0f, 200.0f)
-        Graphics.Draw(resources.img, data.pos.X, data.pos.Y)
+    // update the model with the mouse button pressed by end user
+    let handleMouseInput (data: Model) = 
+        data
+
+    // update the model with game mechanics
+    let handleMechanics (data: Model, res: Resources, dt): Model =
+
+        data
+
+    let genDisplayList (data: Model, res:Resources) =
+        let mutable scnDisplayList: DisplayList = {
+            bgLayer                 = Seq.empty
+            objInteractiveLayer     = Seq.empty
+            objNonInteractiveLayer  = Seq.empty
+            uiInteractiveLayer      = Seq.empty
+            uiNonInteractiveLayer   = Seq.empty
+            debugLayer              = Seq.empty
+        }
+
+        let spr:Entity      = EnSprite(texture = res.img, x = data.ballPos.X, y = data.ballPos.Y)
+        scnDisplayList.objNonInteractiveLayer <- Seq.append scnDisplayList.objNonInteractiveLayer [spr]
+
+        let text: Entity    = EnText( value = "Game Scene", x = 10.0f, y = 200.0f )
+        scnDisplayList.uiNonInteractiveLayer <- Seq.append scnDisplayList.uiNonInteractiveLayer [text]
+
+        scnDisplayList
+
+        // Graphics.Print("Game Scene", 10.0f, 200.0f)
+        // Graphics.Draw(Data.res.img, data.ballPos.X, data.ballPos.Y)

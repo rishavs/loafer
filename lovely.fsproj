@@ -7,7 +7,6 @@
 
     <ItemGroup>
         <Compile Include="Defs.fs" />
-        <Compile Include="scenes\IntroScn.fs" />
         <Compile Include="scenes\GameScn.fs" />
         <Compile Include="scenes\MainMenuScn.fs" />
         <Compile Include="Game.fs" />

@@ -9,7 +9,7 @@ module IntroScene =
     
     // constants and static resources are kept here
     let resources = { 
-        scene   = IntroScn
+        scene   = MainMenuScn
     }
     type Model =
         { text: string ; counter: int }

@@ -2,39 +2,76 @@ namespace MyGame
 
 module Game =
     open Love
-
-    type Model =
-        { mutable currentScene: AvailableScenes }
         
     type Runner() as __ =
         inherit Scene()
 
-        let model: Model = 
-            { currentScene = IntroScn }
+        override this.KeyPressed(key, scode, isRepeat) =
+            // handle global keys
+            match key with
+            | KeyConstant.Escape -> Event.Quit(0)
+            | KeyConstant.Number2 -> 
+                Data.state.currentScene <- MainMenuScn
+            | KeyConstant.Number3 -> 
+                Data.state.currentScene <- GameScn
+            | _ -> ()            
+
+            // handle scene specific keys 
+            match Data.state.currentScene with
+            | MainMenuScn -> 
+                Data.state <- MainMenuScene.handleKeyInput(Data.state, key, scode, isRepeat)
+            | GameScn  -> 
+                Data.state <- GameScene.handleKeyInput(Data.state, key, scode, isRepeat)
+
+        override this.MouseReleased(x, y, btn, isTouch) = 
+            ()
 
         override this.Update(dt: float32) =
             // TODO: Add your update logic here
             
-            match model.currentScene with 
-            | IntroScn    -> 
-                IntroScene.model    <- IntroScene.update (IntroScene.model, IntroScene.resources, dt)
+            match Data.state.currentScene with 
             | MainMenuScn -> 
-                MainMenuScene.model <- MainMenuScene.update (MainMenuScene.model, MainMenuScene.resources, dt)
+                Data.state  <- MainMenuScene.handleMechanics (Data.state, Data.res, dt)
             | GameScn     -> 
-                GameScene.model     <- GameScene.update (GameScene.model, GameScene.resources, dt)
+                Data.state  <- GameScene.handleMechanics (Data.state, Data.res, dt)
 
-            if Keyboard.IsDown(KeyConstant.Number1) then model.currentScene <- IntroScn
-            if Keyboard.IsDown(KeyConstant.Number2) then model.currentScene <- MainMenuScn
-            if Keyboard.IsDown(KeyConstant.Number3) then model.currentScene <- GameScn
+            // if Keyboard.IsDown(KeyConstant.Number2) then Data.state.currentScene <- MainMenuScn
+            // if Keyboard.IsDown(KeyConstant.Number3) then Data.state.currentScene <- GameScn
 
         override this.Draw() =
             // TODO: Add your drawing code here
 
-            match model.currentScene with 
-            | IntroScn    -> IntroScene.draw IntroScene.model
-            | MainMenuScn -> MainMenuScene.draw MainMenuScene.model
-            | GameScn     -> GameScene.draw GameScene.model
+            let displayList =
+                match Data.state.currentScene with 
+                | MainMenuScn -> MainMenuScene.genDisplayList (Data.state, Data.res)
+                | GameScn     -> GameScene.genDisplayList (Data.state, Data.res)
+           
+            // if any debug info needs to be added do here
+            let fpsText     = EnText( value = "FPS: " + string (Timer.GetFPS()), x = 10.0f, y = 0.0f )
+            displayList.debugLayer <- Seq.append displayList.debugLayer [fpsText]
 
-            Graphics.Print("FPS: " + string (Timer.GetFPS()), 10.0f, 10.0f)
-            Graphics.Print("Press 1 for Intro, 2 for Main Menu, and 3 for Game Scenes", 10.0f, 50.0f)
-            Graphics.Print(string model.currentScene, 10.0f, 100.0f)
+            let timeDeltaText = EnText( value = "FPS: " + string (Timer.GetAverageDelta()), x = 10.0f, y = 50.0f )
+            displayList.debugLayer <- Seq.append displayList.debugLayer [timeDeltaText]
+
+            let instrText   = EnText( value = "Press 1 for Intro, 2 for Main Menu, and 3 for Game Scenes", x = 10.0f, y = 100.0f )
+            displayList.debugLayer <- Seq.append displayList.debugLayer [instrText]
+
+            let scnText     = EnText( value = string Data.state.currentScene, x = 10.0f, y = 150.0f )
+            displayList.debugLayer <- Seq.append displayList.debugLayer [scnText]
+
+            let renderLayer(entSeq: seq<Entity>) =
+                entSeq |> Seq.iter (
+                    fun ent ->
+                        match ent with
+                        | EnText (value, x, y)   -> Graphics.Print(value, x, y)
+                        | EnSprite (texture, x, y) -> Graphics.Draw(texture, x, y)
+                        | _ -> ()
+                    )                    
+
+            renderLayer displayList.bgLayer
+            renderLayer displayList.objNonInteractiveLayer
+            renderLayer displayList.objInteractiveLayer
+            renderLayer displayList.uiNonInteractiveLayer
+            renderLayer displayList.uiInteractiveLayer
+            renderLayer displayList.debugLayer
+

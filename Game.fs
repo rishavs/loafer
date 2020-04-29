@@ -6,6 +6,9 @@ module Game =
     type Runner() as __ =
         inherit Scene()
 
+        override this.Load() =
+            Keyboard.SetKeyRepeat true
+
         override this.KeyPressed(key, scode, isRepeat) =
             // handle global keys
             match key with
@@ -19,9 +22,9 @@ module Game =
             // handle scene specific keys 
             match Data.state.currentScene with
             | MainMenuScn -> 
-                Data.state <- MainMenuScene.handleKeyInput(Data.state, key, scode, isRepeat)
+                Data.state <- MainMenuScene.handleKeyInput(Data.state, Data.res, Timer.GetAverageDelta(), key, scode, isRepeat)
             | GameScn  -> 
-                Data.state <- GameScene.handleKeyInput(Data.state, key, scode, isRepeat)
+                Data.state <- GameScene.handleKeyInput(Data.state, Data.res,  Timer.GetAverageDelta(), key, scode, isRepeat)
 
         override this.MouseReleased(x, y, btn, isTouch) = 
             ()
@@ -34,9 +37,6 @@ module Game =
                 Data.state  <- MainMenuScene.handleMechanics (Data.state, Data.res, dt)
             | GameScn     -> 
                 Data.state  <- GameScene.handleMechanics (Data.state, Data.res, dt)
-
-            // if Keyboard.IsDown(KeyConstant.Number2) then Data.state.currentScene <- MainMenuScn
-            // if Keyboard.IsDown(KeyConstant.Number3) then Data.state.currentScene <- GameScn
 
         override this.Draw() =
             // TODO: Add your drawing code here
@@ -55,9 +55,6 @@ module Game =
 
             let instrText   = EnText( value = "Press 1 for Intro, 2 for Main Menu, and 3 for Game Scenes", x = 10.0f, y = 100.0f )
             displayList.debugLayer <- Seq.append displayList.debugLayer [instrText]
-
-            let scnText     = EnText( value = string Data.state.currentScene, x = 10.0f, y = 150.0f )
-            displayList.debugLayer <- Seq.append displayList.debugLayer [scnText]
 
             let renderLayer(entSeq: seq<Entity>) =
                 entSeq |> Seq.iter (

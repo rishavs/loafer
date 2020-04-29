@@ -14,7 +14,8 @@ type Entity =
     | EnSprite        of texture: Love.Texture    * x: float32 * y: float32 
     | EnAnimSprite
     | EnShape
-
+    | EnBtn
+    
 type DisplayList = {
     mutable bgLayer                 : seq<Entity>
     mutable objInteractiveLayer     : seq<Entity>

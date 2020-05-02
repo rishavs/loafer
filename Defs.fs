@@ -1,6 +1,7 @@
 namespace MyGame
 
 open Love
+open System.Collections.Generic
 
 // ------------------------------------------------------
 // Shared types and definitions go here
@@ -9,52 +10,73 @@ type AvailableScenes =
     | MainMenuScn
     | GameScn
 
-type Entity =
-    | EnText           of value : string           * x: float32 * y: float32 
-    | EnSprite        of texture: Love.Texture    * x: float32 * y: float32 
-    | EnAnimSprite
-    | EnShape
-    | EnBtn
-    
-type DisplayList = {
-    mutable bgLayer                 : seq<Entity>
-    mutable objInteractiveLayer     : seq<Entity>
-    mutable objNonInteractiveLayer  : seq<Entity>
-    mutable uiInteractiveLayer      : seq<Entity>
-    mutable uiNonInteractiveLayer   : seq<Entity>
-    mutable debugLayer              : seq<Entity>
-}
+type BtnState =
+    | Default of Color
+    | Hover of Color
+    | Click of Color
 
+type Entity =
+    | EnText of value : string * x: float32 * y: float32 
+    | EnSprite of texture: Love.Texture * x: float32 * y: float32 
+    | EnBtn of width: float32 * height : float32 * btnState : BtnState * x: float32 * y: float32
+
+type DrawableEntities = {
+    mutable BgLayer  : Dictionary<string, Entity> 
+    mutable ObjLayer : Dictionary<string, Entity>  
+    mutable UiLayer  : Dictionary<string, Entity> 
+    mutable DbgLayer : Dictionary<string, Entity> 
+} 
 
 type Resources = { 
-    scene   : AvailableScenes
-    speed   : float32
-    img     : Image
+    Scene   : AvailableScenes
+    Speed   : float32
+    Img     : Image
 }
 
 type Model = { 
-    mutable currentScene: AvailableScenes
-    mutable counter: int 
-    mutable ballPos: Vector2
+    mutable CurrentScene: AvailableScenes
+    mutable Counter: int 
+    mutable BallPos: Vector2
+    mutable MainMenuStartBtnState: BtnState
+    mutable MainMenuSettingsBtnState: BtnState
+    mutable MainMenuExitBtnState: BtnState
 }
 
 module Data = 
     // ------------------------------------------------------
     // Constants and statis resources are declared here
     // ------------------------------------------------------
-    let res = { 
-        scene   = GameScn
-        speed   = 300.0f
-        img     = Graphics.NewImage "assets/red_ball.png"
+    let Res = { 
+        Scene   = GameScn
+        Speed   = 300.0f
+        Img     = Graphics.NewImage "assets/red_ball.png"
     }    
 
     // ------------------------------------------------------
     // Mutable game state goes in here
     // ------------------------------------------------------
-    let mutable state: Model = {
-        currentScene = MainMenuScn 
-        counter = 0
-        ballPos = Vector2(300.0f, 300.0f)
+    let ResetModel: Model = {
+        CurrentScene                = MainMenuScn 
+        Counter                     = 0
+        BallPos                     = Vector2(300.0f, 300.0f)
+        MainMenuStartBtnState       = Default (Color.AliceBlue) 
+        MainMenuSettingsBtnState    = Default (Color.AliceBlue)
+        MainMenuExitBtnState        = Default (Color.AliceBlue)
     }
+    let mutable State = ResetModel 
+    
+    // ------------------------------------------------------
+    // Mutable display list goes in here
+    // ------------------------------------------------------
+    let DisplayList = {
+        BgLayer  = Dictionary<string, Entity>()  
+        ObjLayer = Dictionary<string, Entity>()  
+        UiLayer  = Dictionary<string, Entity>() 
+        DbgLayer = Dictionary<string, Entity>() 
+    } 
+    
+    // indexes for faster lookup of interactive elements
+    let entityClickable = seq<string>
+    let entityHoverable = seq<string>
 
 

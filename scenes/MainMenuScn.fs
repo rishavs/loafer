@@ -15,7 +15,7 @@ module MainMenuScene =
         data
 
     // generate display list for this scene
-    let genDisplayList (data: Model, res: Resources): DisplayList =
+    let genDisplayList (data: Model, res: Resources): DrawableEntities =
 
         let mutable scnDisplayList: DisplayList = {
             bgLayer                 = Seq.empty
@@ -29,5 +29,19 @@ module MainMenuScene =
         let text: Entity = EnText( value = "Main Menu Scene", x = 10.0f, y = 150.0f )
         scnDisplayList.uiNonInteractiveLayer <- Seq.append scnDisplayList.uiNonInteractiveLayer [text]
 
+        let startBtn:Entity = EnBtn (width = 200.0f, height = 50.0f, btnState = Default(Color.Beige), x = 200.0f, y = 300.0f)
+        scnDisplayList.uiInteractiveLayer <- Seq.append scnDisplayList.uiInteractiveLayer [startBtn]
+
+        let settingsBtn:Entity = EnBtn (width = 200.0f, height = 50.0f, btnState = Default(Color.Beige), x = 200.0f, y = 400.0f)
+        scnDisplayList.uiInteractiveLayer <- Seq.append scnDisplayList.uiInteractiveLayer [settingsBtn]
+        
+        let exitBtn:Entity = EnBtn (width = 200.0f, height = 50.0f, btnState = Default(Color.Beige), x = 200.0f, y = 500.0f)
+        scnDisplayList.uiInteractiveLayer <- Seq.append scnDisplayList.uiInteractiveLayer [exitBtn]
+
         scnDisplayList
 
+    let Init =
+        ()    
+
+    let Cleanup = 
+        ()

@@ -1,7 +1,11 @@
 namespace MyGame
 
+
 module GameScene =
     open Love
+    open System
+
+    // generate display list in load?
     
     // update the model with the keys pressed by end user
     let handleKeyInput(data: Model, res: Resources, dt, key, scode, isRepeat) = 
@@ -11,13 +15,13 @@ module GameScene =
 
         match key with
         | KeyConstant.W -> 
-            y <- y - (res.speed * dt * 5.0f) 
+            y <- Math.Clamp ((y - (res.speed * dt * 5.0f)), 0.0f, 1000.0f)
         | KeyConstant.D ->
-            x <- x + (res.speed * dt * 5.0f) 
+            x <- Math.Clamp ((x + (res.speed * dt * 5.0f)),  0.0f, 1000.0f)
         | KeyConstant.S ->
-            y <- y + (res.speed * dt * 5.0f) 
+            y <- Math.Clamp ((y + (res.speed * dt * 5.0f)), 0.0f, 1000.0f)
         | KeyConstant.A ->
-            x <- x - (res.speed * dt * 5.0f) 
+            x <- Math.Clamp ((x - (res.speed * dt * 5.0f)), 0.0f, 1000.0f)
         | _ -> ()
 
         { data with ballPos = Vector2(x,y)}
@@ -56,3 +60,9 @@ module GameScene =
         scnDisplayList.uiNonInteractiveLayer <- Seq.append scnDisplayList.uiNonInteractiveLayer [text]
 
         scnDisplayList
+
+    let Init =
+        ()    
+
+    let Cleanup = 
+        ()

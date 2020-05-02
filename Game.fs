@@ -14,17 +14,17 @@ module Game =
             match key with
             | KeyConstant.Escape -> Event.Quit(0)
             | KeyConstant.Number2 -> 
-                Data.state.currentScene <- MainMenuScn
+                Data.State.CurrentScene <- MainMenuScn
             | KeyConstant.Number3 -> 
-                Data.state.currentScene <- GameScn
+                Data.State.CurrentScene <- GameScn
             | _ -> ()            
 
             // handle scene specific keys 
-            match Data.state.currentScene with
+            match Data.State.CurrentScene with
             | MainMenuScn -> 
-                Data.state <- MainMenuScene.handleKeyInput(Data.state, Data.res, Timer.GetAverageDelta(), key, scode, isRepeat)
+                Data.State <- MainMenuScene.handleKeyInput(Data.State, Data.Res, Timer.GetAverageDelta(), key, scode, isRepeat)
             | GameScn  -> 
-                Data.state <- GameScene.handleKeyInput(Data.state, Data.res,  Timer.GetAverageDelta(), key, scode, isRepeat)
+                Data.State <- GameScene.handleKeyInput(Data.State, Data.Res,  Timer.GetAverageDelta(), key, scode, isRepeat)
 
         override this.MouseReleased(x, y, btn, isTouch) = 
             ()
@@ -32,29 +32,29 @@ module Game =
         override this.Update(dt: float32) =
             // TODO: Add your update logic here
             
-            match Data.state.currentScene with 
+            match Data.State.CurrentScene with 
             | MainMenuScn -> 
-                Data.state  <- MainMenuScene.handleMechanics (Data.state, Data.res, dt)
+                Data.State  <- MainMenuScene.handleMechanics (Data.State, Data.Res, dt)
             | GameScn     -> 
-                Data.state  <- GameScene.handleMechanics (Data.state, Data.res, dt)
+                Data.State  <- GameScene.handleMechanics (Data.State, Data.Res, dt)
 
         override this.Draw() =
             // TODO: Add your drawing code here
 
             let displayList =
-                match Data.state.currentScene with 
-                | MainMenuScn -> MainMenuScene.genDisplayList (Data.state, Data.res)
-                | GameScn     -> GameScene.genDisplayList (Data.state, Data.res)
+                match Data.State.CurrentScene with 
+                | MainMenuScn -> MainMenuScene.genDisplayList (Data.State, Data.Res)
+                | GameScn     -> GameScene.genDisplayList (Data.State, Data.Res)
            
             // if any debug info needs to be added do here
             let fpsText     = EnText( value = "FPS: " + string (Timer.GetFPS()), x = 10.0f, y = 0.0f )
-            displayList.debugLayer <- Seq.append displayList.debugLayer [fpsText]
+            displayList.DbgLayer <- Seq.append displayList.DbgLayer [fpsText]
 
             let timeDeltaText = EnText( value = "FPS: " + string (Timer.GetAverageDelta()), x = 10.0f, y = 50.0f )
-            displayList.debugLayer <- Seq.append displayList.debugLayer [timeDeltaText]
+            displayList.DbgLayer <- Seq.append displayList.DbgLayer [timeDeltaText]
 
             let instrText   = EnText( value = "Press 1 for Intro, 2 for Main Menu, and 3 for Game Scenes", x = 10.0f, y = 100.0f )
-            displayList.debugLayer <- Seq.append displayList.debugLayer [instrText]
+            displayList.DbgLayer <- Seq.append displayList.DbgLayer [instrText]
 
             let renderLayer(entSeq: seq<Entity>) =
                 entSeq |> Seq.iter (
@@ -62,7 +62,10 @@ module Game =
                         match ent with
                         | EnText (value, x, y)   -> Graphics.Print(value, x, y)
                         | EnSprite (texture, x, y) -> Graphics.Draw(texture, x, y)
-                        | _ -> ()
+                        | EnBtn (width, height, btnState, x, y) -> 
+                            Graphics.Rectangle(DrawMode.Fill,  x, y, width, height)
+
+                        //  add check for hover in this loop itself?
                     )                    
 
             renderLayer displayList.bgLayer
